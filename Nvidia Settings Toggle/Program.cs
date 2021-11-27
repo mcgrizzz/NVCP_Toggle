@@ -20,16 +20,42 @@ namespace NVCP_Toggle
         {
             NVIDIA.Initialize();
             setupConfig();
-            NvAPIWrapper.Display.Display mainDisplay = GetNvidiaMainDisplay();
-            int currentVibrance = mainDisplay.DigitalVibranceControl.CurrentLevel;
-            int currentHue = mainDisplay.HUEControl.CurrentAngle;
-            Display windowsDisplay = GetWindowsDisplay();
 
-            Console.WriteLine("Main Display: " + windowsDisplay.ToPathDisplayTarget().FriendlyName);
-
+            bool allDisplays = Boolean.Parse(ConfigurationManager.AppSettings["toggleAllDisplays"]);
             int[] colorSettings = loadCustomColorSettings();
             double[] gammaRamp = loadCustomGammaRamp();
 
+            if (allDisplays)
+            {
+                Console.WriteLine("Toggling all displays...\n");
+                Display[] windowsDisplays = Display.GetDisplays().ToArray();
+                NvAPIWrapper.Display.Display[] nvDisplays = NvAPIWrapper.Display.Display.GetDisplays();
+
+                for(int i = 0; i < windowsDisplays.Length; i++)
+                {
+                    Display windowsDisplay = windowsDisplays[i];
+                    NvAPIWrapper.Display.Display nvDisplay = nvDisplays[i];
+                    toggleDisplay(nvDisplay, windowsDisplay, colorSettings, gammaRamp);
+                    Console.WriteLine("");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Toggling primary display...\n");
+                NvAPIWrapper.Display.Display nvDisplay = GetNvidiaMainDisplay();
+                Display windowsDisplay = GetWindowsDisplay();
+                toggleDisplay(nvDisplay, windowsDisplay, colorSettings, gammaRamp);
+            }
+
+            Console.WriteLine("Press any key to close...");
+            Console.ReadKey();
+        }
+
+        private static void toggleDisplay(NvAPIWrapper.Display.Display nvDisplay, Display windowsDisplay, int[] colorSettings, double[] gammaRamp) 
+        {
+            int currentVibrance = nvDisplay.DigitalVibranceControl.CurrentLevel;
+            int currentHue = nvDisplay.HUEControl.CurrentAngle;
+            Console.WriteLine("Display: " + windowsDisplay.ToPathDisplayTarget().FriendlyName);
             if (currentVibrance == defaultVibrance && currentHue == defaultHue)
             {
                 //Toggle on
@@ -37,8 +63,8 @@ namespace NVCP_Toggle
                 Console.WriteLine("Vibrance: " + colorSettings[0] + " Hue: " + colorSettings[1]);
                 Console.WriteLine("Brightness: " + gammaRamp[0] + " Contrast: " + gammaRamp[1] + " Gamma: " + gammaRamp[2]);
 
-                mainDisplay.DigitalVibranceControl.CurrentLevel = colorSettings[0];
-                mainDisplay.HUEControl.CurrentAngle = colorSettings[1];
+                nvDisplay.DigitalVibranceControl.CurrentLevel = colorSettings[0];
+                nvDisplay.HUEControl.CurrentAngle = colorSettings[1];
 
                 windowsDisplay.GammaRamp = new DisplayGammaRamp(gammaRamp[0], gammaRamp[1], gammaRamp[2]);
             }
@@ -46,14 +72,11 @@ namespace NVCP_Toggle
             {
                 //Toggle off
                 Console.WriteLine("Resetting to default settings...");
-                mainDisplay.DigitalVibranceControl.CurrentLevel = defaultVibrance;
-                mainDisplay.HUEControl.CurrentAngle = defaultHue;
-                
-                windowsDisplay.GammaRamp = new DisplayGammaRamp(defaultBrightness, defaultContrast, defaultGamma );
-            }
+                nvDisplay.DigitalVibranceControl.CurrentLevel = defaultVibrance;
+                nvDisplay.HUEControl.CurrentAngle = defaultHue;
 
-            Console.WriteLine("Press any key to close...");
-            Console.ReadKey();
+                windowsDisplay.GammaRamp = new DisplayGammaRamp(defaultBrightness, defaultContrast, defaultGamma);
+            }
         }
 
         //From: https://stackoverflow.com/a/62330624
