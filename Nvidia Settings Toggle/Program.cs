@@ -23,28 +23,35 @@ namespace NVCP_Toggle
             int currentHue = mainDisplay.HUEControl.CurrentAngle;
             Display windowsDisplay = GetWindowsDisplay();
 
+            Console.WriteLine("Main Display: " + windowsDisplay.ToPathDisplayTarget().FriendlyName);
+
             int[] colorSettings = loadCustomColorSettings();
             double[] gammaRamp = loadCustomGammaRamp();
 
             if (currentVibrance == defaultVibrance && currentHue == defaultHue)
             {
                 //Toggle on
+                Console.WriteLine("Toggling Custom Settings:");
+                Console.WriteLine("Vibrance: " + colorSettings[0] + " Hue: " + colorSettings[1]);
+                Console.WriteLine("Brightness: " + gammaRamp[0] + " Contrast: " + gammaRamp[1] + " Gamma: " + gammaRamp[2]);
+
                 mainDisplay.DigitalVibranceControl.CurrentLevel = colorSettings[0];
                 mainDisplay.HUEControl.CurrentAngle = colorSettings[1];
 
                 windowsDisplay.GammaRamp = new DisplayGammaRamp(gammaRamp[0], gammaRamp[1], gammaRamp[2]);
-
-                Console.WriteLine("Toggling ON");
             }
             else
             {
                 //Toggle off
+                Console.WriteLine("Resetting to default settings...");
                 mainDisplay.DigitalVibranceControl.CurrentLevel = defaultVibrance;
                 mainDisplay.HUEControl.CurrentAngle = defaultHue;
                 
                 windowsDisplay.GammaRamp = new DisplayGammaRamp(defaultBrightness, defaultContrast, defaultGamma );
-                Console.WriteLine("Toggling OFF");
             }
+
+            Console.WriteLine("Press any key to close...");
+            Console.ReadKey();
         }
 
         private static int[] loadCustomColorSettings()
