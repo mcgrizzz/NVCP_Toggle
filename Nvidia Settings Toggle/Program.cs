@@ -35,7 +35,7 @@ namespace NVCP_Toggle
 
             try
             {
-                config = GetConfig(); ;
+                config = GetConfig();
             }catch(Exception e)
             {
                 Console.WriteLine("\nERROR: Unable to find or load 'appSettings.json'");
@@ -51,7 +51,7 @@ namespace NVCP_Toggle
             bool keyPressToExit = Boolean.Parse(config.GetSection("keyPressToExit").Value);
 
             int[] colorSettings = LoadCustomColorSettings(config);
-            double[] gammaRamp = LoadCustomGammaRamp(config);
+            float[] gammaRamp = LoadCustomGammaRamp(config);
 
             if (allDisplays)
             {
@@ -83,7 +83,7 @@ namespace NVCP_Toggle
             
         }
 
-        private static void ToggleDisplay(NvAPIWrapper.Display.Display nvDisplay, Display windowsDisplay, int[] colorSettings, double[] gammaRamp) 
+        private static void ToggleDisplay(NvAPIWrapper.Display.Display nvDisplay, Display windowsDisplay, int[] colorSettings, float[] gammaRamp) 
         {
             int currentVibrance = nvDisplay.DigitalVibranceControl.CurrentLevel;
             int currentHue = nvDisplay.HUEControl.CurrentAngle;
@@ -123,17 +123,17 @@ namespace NVCP_Toggle
         private static int[] LoadCustomColorSettings(IConfigurationRoot config)
         {
             int[] colors = new int[2];
-            colors[0] = Int32.Parse(config.GetSection("vibrance").Value);
-            colors[1] = Int32.Parse(config.GetSection("hue").Value);
+            colors[0] = config.GetValue<int>("vibrance");
+            colors[1] = config.GetValue<int>("hue");
             return colors;
         }
 
-        private static double[] LoadCustomGammaRamp(IConfigurationRoot config)
+        private static float[] LoadCustomGammaRamp(IConfigurationRoot config)
         {
-            double[] gamma = new double[3];
-            gamma[0] = Double.Parse(config.GetSection("brightness").Value);
-            gamma[1] = Double.Parse(config.GetSection("contrast").Value);
-            gamma[2] = Double.Parse(config.GetSection("gamma").Value);
+            float[] gamma = new float[3];
+            gamma[0] = config.GetValue<float>("brightness");
+            gamma[1] = config.GetValue<float>("contrast");
+            gamma[2] = config.GetValue<float>("gamma");
             return gamma;
         }
 
