@@ -18,10 +18,38 @@ namespace NVCP_Toggle
 
         static void Main(string[] args)
         {
-            NVIDIA.Initialize();
-            IConfigurationRoot config = GetConfig();
+            try
+            {
+                NVIDIA.Initialize();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("\nERROR: Unable to initialize nvidia api");
+                Console.WriteLine(e.StackTrace);
+                Console.WriteLine("\nPress any key to exit...");
+                Console.ReadKey();
+                return;
+            }
+
+            IConfigurationRoot config;
+
+            try
+            {
+                config = GetConfig(); ;
+            }catch(Exception e)
+            {
+                Console.WriteLine("\nERROR: Unable to find or load 'appSettings.json'");
+                Console.WriteLine(e.StackTrace);
+                Console.WriteLine("\nPress any key to exit...");
+                Console.ReadKey();
+                return;
+            }
+
+
 
             bool allDisplays = Boolean.Parse(config.GetSection("toggleAllDisplays").Value);
+            bool keyPressToExit = Boolean.Parse(config.GetSection("keyPressToExit").Value);
+
             int[] colorSettings = LoadCustomColorSettings(config);
             double[] gammaRamp = LoadCustomGammaRamp(config);
 
@@ -47,8 +75,12 @@ namespace NVCP_Toggle
                 ToggleDisplay(nvDisplay, windowsDisplay, colorSettings, gammaRamp);
             }
 
-            Console.WriteLine("Press any key to close...");
-            Console.ReadKey();
+            if (keyPressToExit)
+            {
+                Console.WriteLine("\nPress any key to exit...");
+                Console.ReadKey();
+            }
+            
         }
 
         private static void ToggleDisplay(NvAPIWrapper.Display.Display nvDisplay, Display windowsDisplay, int[] colorSettings, double[] gammaRamp) 
