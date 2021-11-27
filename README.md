@@ -4,6 +4,7 @@
 - I made this for myself, so I'm not guaranteeing support. But reasonable issues may be addressed
 
 ## Usage
+- Download the bundled version if you do not have .NET core runtime installed
 - Edit the values in NVCP appSettings.json to change what values the program will toggle
 - Run NVCP Toggle.exe to toggle. It's easiest to put a shortcut on your desktop or task bar for quick toggling
 
