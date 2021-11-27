@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>NVCP_Toggle</RootNamespace>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <StartupObject>NVCP_Toggle.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NvAPIWrapper.Net" Version="0.8.1.101" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="WindowsDisplayAPI">
+      <HintPath>..\..\..\Libraries\WindowsDisplayAPI-master\WindowsDisplayAPI\obj\Debug\net45\WindowsDisplayAPI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
