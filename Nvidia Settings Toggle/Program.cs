@@ -86,7 +86,7 @@ namespace NVCP_Toggle
             for(int i = 0; i < NvAPIWrapper.Display.PathInfo.GetDisplaysConfig().Length; i++)
             {
                 NvAPIWrapper.Display.PathInfo info = NvAPIWrapper.Display.PathInfo.GetDisplaysConfig()[i];
-                if(info.Position.X == 0 && info.Position.Y == 0)
+                if(info.IsGDIPrimary)
                 {
                     return allDisplays[i];
                 }
