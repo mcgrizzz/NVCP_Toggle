@@ -4,5 +4,9 @@
 - I made this for myself, so I'm not guaranteeing support. But reasonable issues may be addressed
 
 ## Usage
-- Edit the values in NVCP Toggle.dll.config to change what values the program will toggle
+- Edit the values in NVCP appSettings.json to change what values the program will toggle
 - Run NVCP Toggle.exe to toggle. It's easiest to put a shortcut on your desktop or task bar for quick toggling
+
+## Known Issues and Caveats
+- The base program will not run without .NET Core 3.1 Runtime installed. If you do not want to install this, you can use the bundled version. In this case it will be slower to toggle on and off +/- a few seconds depending on your computer speed.
+- DisplayCal profile loader will override the gammaramp color settings (brightness, contrast, gamma). I'm looking into potential fixes to get it to behave.

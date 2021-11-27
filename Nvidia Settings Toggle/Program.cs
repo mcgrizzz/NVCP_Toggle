@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Configuration;
-using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 using NvAPIWrapper;
 using WindowsDisplayAPI;
 
@@ -19,11 +19,11 @@ namespace NVCP_Toggle
         static void Main(string[] args)
         {
             NVIDIA.Initialize();
-            setupConfig();
+            IConfigurationRoot config = getConfig();
 
-            bool allDisplays = Boolean.Parse(ConfigurationManager.AppSettings["toggleAllDisplays"]);
-            int[] colorSettings = loadCustomColorSettings();
-            double[] gammaRamp = loadCustomGammaRamp();
+            bool allDisplays = Boolean.Parse(config.GetSection("toggleAllDisplays").Value);
+            int[] colorSettings = loadCustomColorSettings(config);
+            double[] gammaRamp = loadCustomGammaRamp(config);
 
             if (allDisplays)
             {
@@ -79,36 +79,29 @@ namespace NVCP_Toggle
             }
         }
 
-        //From: https://stackoverflow.com/a/62330624
-        private static void setupConfig()
+        private static IConfigurationRoot getConfig()
         {
-            string programName = "NVCP Toggle";
-            var sourceHostFile = Directory.GetCurrentDirectory() + @"\" + programName + @".dll.config";
-            // to load yourProgram.dll.config
-            // With Single-file executables, all files are bundled in a single host file with the .exe extension. 
-            // When that file runs for the first time, it unpacks its contents to AppData\Local\Temp\.net\, in a new folder named for the application
-            var targetHostFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).FilePath;
-            // ignore when in debug mode in vs ide
-            if (sourceHostFile != targetHostFile)
-            {
-                File.Copy(sourceHostFile, targetHostFile, true);
-            }
+
+            return new ConfigurationBuilder()
+                .SetBasePath(Environment.CurrentDirectory)
+                .AddJsonFile("appSettings.json", optional: false)
+                .Build();
         }
 
-        private static int[] loadCustomColorSettings()
+        private static int[] loadCustomColorSettings(IConfigurationRoot config)
         {
             int[] colors = new int[2];
-            colors[0] = Int32.Parse(ConfigurationManager.AppSettings["vibrance"]);
-            colors[1] = Int32.Parse(ConfigurationManager.AppSettings["hue"]);
+            colors[0] = Int32.Parse(config.GetSection("vibrance").Value);
+            colors[1] = Int32.Parse(config.GetSection("hue").Value);
             return colors;
         }
 
-        private static double[] loadCustomGammaRamp()
+        private static double[] loadCustomGammaRamp(IConfigurationRoot config)
         {
             double[] gamma = new double[3];
-            gamma[0] = Double.Parse(ConfigurationManager.AppSettings["brightness"]);
-            gamma[1] = Double.Parse(ConfigurationManager.AppSettings["contrast"]);
-            gamma[2] = Double.Parse(ConfigurationManager.AppSettings["gamma"]);
+            gamma[0] = Double.Parse(config.GetSection("brightness").Value);
+            gamma[1] = Double.Parse(config.GetSection("contrast").Value);
+            gamma[2] = Double.Parse(config.GetSection("gamma").Value);
             return gamma;
         }
 
