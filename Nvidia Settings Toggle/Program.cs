@@ -9,21 +9,21 @@ namespace NVCP_Toggle
 {
     class Program
     {
-        static int defaultVibrance = 50;
-        static int defaultHue = 0;
+        static int DefaultVibrance = 50;
+        static int DefaultHue = 0;
 
-        static double defaultBrightness = .50;
-        static double defaultContrast = .50;
-        static double defaultGamma = 1.0;
+        static double DefaultBrightness = .50;
+        static double DefaultContrast = .50;
+        static double DefaultGamma = 1.0;
 
         static void Main(string[] args)
         {
             NVIDIA.Initialize();
-            IConfigurationRoot config = getConfig();
+            IConfigurationRoot config = GetConfig();
 
             bool allDisplays = Boolean.Parse(config.GetSection("toggleAllDisplays").Value);
-            int[] colorSettings = loadCustomColorSettings(config);
-            double[] gammaRamp = loadCustomGammaRamp(config);
+            int[] colorSettings = LoadCustomColorSettings(config);
+            double[] gammaRamp = LoadCustomGammaRamp(config);
 
             if (allDisplays)
             {
@@ -35,7 +35,7 @@ namespace NVCP_Toggle
                 {
                     Display windowsDisplay = windowsDisplays[i];
                     NvAPIWrapper.Display.Display nvDisplay = nvDisplays[i];
-                    toggleDisplay(nvDisplay, windowsDisplay, colorSettings, gammaRamp);
+                    ToggleDisplay(nvDisplay, windowsDisplay, colorSettings, gammaRamp);
                     Console.WriteLine("");
                 }
             }
@@ -44,19 +44,19 @@ namespace NVCP_Toggle
                 Console.WriteLine("Toggling primary display...\n");
                 NvAPIWrapper.Display.Display nvDisplay = GetNvidiaMainDisplay();
                 Display windowsDisplay = GetWindowsDisplay();
-                toggleDisplay(nvDisplay, windowsDisplay, colorSettings, gammaRamp);
+                ToggleDisplay(nvDisplay, windowsDisplay, colorSettings, gammaRamp);
             }
 
             Console.WriteLine("Press any key to close...");
             Console.ReadKey();
         }
 
-        private static void toggleDisplay(NvAPIWrapper.Display.Display nvDisplay, Display windowsDisplay, int[] colorSettings, double[] gammaRamp) 
+        private static void ToggleDisplay(NvAPIWrapper.Display.Display nvDisplay, Display windowsDisplay, int[] colorSettings, double[] gammaRamp) 
         {
             int currentVibrance = nvDisplay.DigitalVibranceControl.CurrentLevel;
             int currentHue = nvDisplay.HUEControl.CurrentAngle;
             Console.WriteLine("Display: " + windowsDisplay.ToPathDisplayTarget().FriendlyName);
-            if (currentVibrance == defaultVibrance && currentHue == defaultHue)
+            if (currentVibrance == DefaultVibrance && currentHue == DefaultHue)
             {
                 //Toggle on
                 Console.WriteLine("Toggling Custom Settings:");
@@ -72,14 +72,14 @@ namespace NVCP_Toggle
             {
                 //Toggle off
                 Console.WriteLine("Resetting to default settings...");
-                nvDisplay.DigitalVibranceControl.CurrentLevel = defaultVibrance;
-                nvDisplay.HUEControl.CurrentAngle = defaultHue;
+                nvDisplay.DigitalVibranceControl.CurrentLevel = DefaultVibrance;
+                nvDisplay.HUEControl.CurrentAngle = DefaultHue;
 
-                windowsDisplay.GammaRamp = new DisplayGammaRamp(defaultBrightness, defaultContrast, defaultGamma);
+                windowsDisplay.GammaRamp = new DisplayGammaRamp(DefaultBrightness, DefaultContrast, DefaultGamma);
             }
         }
 
-        private static IConfigurationRoot getConfig()
+        private static IConfigurationRoot GetConfig()
         {
 
             return new ConfigurationBuilder()
@@ -88,7 +88,7 @@ namespace NVCP_Toggle
                 .Build();
         }
 
-        private static int[] loadCustomColorSettings(IConfigurationRoot config)
+        private static int[] LoadCustomColorSettings(IConfigurationRoot config)
         {
             int[] colors = new int[2];
             colors[0] = Int32.Parse(config.GetSection("vibrance").Value);
@@ -96,7 +96,7 @@ namespace NVCP_Toggle
             return colors;
         }
 
-        private static double[] loadCustomGammaRamp(IConfigurationRoot config)
+        private static double[] LoadCustomGammaRamp(IConfigurationRoot config)
         {
             double[] gamma = new double[3];
             gamma[0] = Double.Parse(config.GetSection("brightness").Value);
