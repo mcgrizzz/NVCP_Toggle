@@ -14,6 +14,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="App.config">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="WindowsDisplayAPI">
       <HintPath>..\..\..\Libraries\WindowsDisplayAPI-master\WindowsDisplayAPI\obj\Debug\net45\WindowsDisplayAPI.dll</HintPath>
     </Reference>

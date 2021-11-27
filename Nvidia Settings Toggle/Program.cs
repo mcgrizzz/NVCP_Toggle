@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using NvAPIWrapper;
 using WindowsDisplayAPI;
@@ -18,6 +19,7 @@ namespace NVCP_Toggle
         static void Main(string[] args)
         {
             NVIDIA.Initialize();
+            setupConfig();
             NvAPIWrapper.Display.Display mainDisplay = GetNvidiaMainDisplay();
             int currentVibrance = mainDisplay.DigitalVibranceControl.CurrentLevel;
             int currentHue = mainDisplay.HUEControl.CurrentAngle;
@@ -52,6 +54,22 @@ namespace NVCP_Toggle
 
             Console.WriteLine("Press any key to close...");
             Console.ReadKey();
+        }
+
+        //From: https://stackoverflow.com/a/62330624
+        private static void setupConfig()
+        {
+            string programName = "NVCP Toggle";
+            var sourceHostFile = Directory.GetCurrentDirectory() + @"\" + programName + @".dll.config";
+            // to load yourProgram.dll.config
+            // With Single-file executables, all files are bundled in a single host file with the .exe extension. 
+            // When that file runs for the first time, it unpacks its contents to AppData\Local\Temp\.net\, in a new folder named for the application
+            var targetHostFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).FilePath;
+            // ignore when in debug mode in vs ide
+            if (sourceHostFile != targetHostFile)
+            {
+                File.Copy(sourceHostFile, targetHostFile, true);
+            }
         }
 
         private static int[] loadCustomColorSettings()
