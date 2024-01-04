@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using NvAPIWrapper;
@@ -15,6 +16,8 @@ namespace NVCP_Toggle
         static double DefaultBrightness = .50;
         static double DefaultContrast = .50;
         static double DefaultGamma = 1.0;
+
+        static DisplayGammaRamp DefaultGammaRamp = new DisplayGammaRamp();
 
         static void Main(string[] args)
         {
@@ -83,12 +86,45 @@ namespace NVCP_Toggle
             
         }
 
+        /**
+            DisplayGammaRamp does not store brightness, contrast, gamma as variables. 
+            So we must compare the rgb ramp values to the default ramp values.
+        */ 
+        private static Boolean HasDefaultGammaRamp(Display windowsDisplay){
+            DisplayGammaRamp gammaRamp = windowsDisplay.GammaRamp;
+            ushort[] redGamma = gammaRamp.Red;
+            ushort[] greenGamma = gammaRamp.Green;
+            ushort[] blueGamma = gammaRamp.Blue;
+
+            for(int i = 0; i < redGamma.Length; i++){
+                if(redGamma[i] != DefaultGammaRamp.Red[i]){
+                    return false;
+                }
+            }
+
+            for(int i = 0; i < greenGamma.Length; i++){
+                if(greenGamma[i] != DefaultGammaRamp.Green[i]){
+                    return false;
+                }
+            }
+
+            for(int i = 0; i < blueGamma.Length; i++){
+                if(blueGamma[i] != DefaultGammaRamp.Blue[i]){
+                    return false;
+                }
+            }
+
+            return true;
+
+        }
+
         private static void ToggleDisplay(NvAPIWrapper.Display.Display nvDisplay, Display windowsDisplay, int[] colorSettings, float[] gammaRamp) 
         {
             int currentVibrance = nvDisplay.DigitalVibranceControl.CurrentLevel;
             int currentHue = nvDisplay.HUEControl.CurrentAngle;
+            
             Console.WriteLine("Display: " + windowsDisplay.ToPathDisplayTarget().FriendlyName);
-            if (currentVibrance == DefaultVibrance && currentHue == DefaultHue)
+            if (currentVibrance == DefaultVibrance && currentHue == DefaultHue && HasDefaultGammaRamp(windowsDisplay))
             {
                 //Toggle on
                 Console.WriteLine("Toggling Custom Settings:");
